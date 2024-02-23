@@ -1,124 +1,152 @@
+#nullable enable
 using System.Text;
+using BepInEx;
 using BepInEx.Logging;
 
 namespace NextShip.Api.Logs;
 
-public abstract class log
+public sealed class Log
 {
-    public readonly ManualLogSource LogSource;
+    public static bool CreateEd;
 
-    static log()
+    public TextWriter? ConsoleWriter;
+
+    public StreamWriter? DiskWriter;
+
+    static Log()
     {
-        ConsoleTextFC();
+        System.Console.OutputEncoding = Encoding.UTF8;
     }
 
-    public log(ManualLogSource logSource)
+    private Log(ManualLogSource logSource)
     {
         LogSource = logSource;
-        Instance = this;
+        ConsoleWriter = ConsoleManager.ConsoleStream;
+        _Instance = this;
     }
 
-    public static log? Instance { get; set; }
-
-    public static void ConsoleTextFC()
+    private Log() : this(new ManualLogSource("NextShip.Api"))
     {
-        if (!System.Console.OutputEncoding.Equals(Encoding.UTF8)) System.Console.OutputEncoding = Encoding.UTF8;
     }
 
-    private void SendToFile(string? tag, string? filename, string text, LogLevel level = LogLevel.Info)
+    public ManualLogSource LogSource { get; private set; }
+
+    private static Log? _Instance;
+
+    public static Log Instance => _Instance ?? new Log();
+
+
+    public void CreateDiskLog(string name, string? path = null)
     {
-        var logger = Instance?.LogSource;
+        var stream = GetDiskLogStream(name, path);
+        DiskWriter = new StreamWriter(stream);
+        DiskWriter.AutoFlush = true;
+
+        DiskWriter.WriteLine($"Next Ship Api Disk Log OutTime:{DateTime.Now:g}");
+    }
+
+    public Stream GetDiskLogStream(string name, string? path = null, bool outTime = false)
+    {
+        if (outTime)
+        {
+            var timeString = DateTime.Now.ToString("g")
+                .Replace("/", "-").Replace(" ", "-").Trim();
+            name = $"{name}_{timeString}.log";
+        }
+
+        path ??= string.Empty;
+
+        var FilePath = path + name;
+
+        if (!File.Exists(FilePath))
+            return File.Create(FilePath);
+
+        Stream stream;
+        var count = 0;
+
+        while (true)
+        {
+            count++;
+            FilePath = path + name + $"_{count}";
+
+            if (!File.Exists(FilePath))
+            {
+                stream = File.Create(FilePath);
+                break;
+            }
+
+            stream = File.Open(FilePath, FileMode.Open);
+            if (stream.Length == 0)
+                break;
+        }
+
+        return stream;
+    }
+
+    public static Log? Get(ManualLogSource logSource)
+    {
+        if (CreateEd)
+        {
+            _Instance?.Set(logSource);
+            return Instance;
+        }
+
+        var _log = new Log(logSource);
+        CreateEd = true;
+        return _log;
+    }
+
+    private void Set(ManualLogSource logSource)
+    {
+        if (logSource != LogSource)
+            LogSource = logSource;
+    }
+
+    internal void SendToFile(string? tag, string? filename, string text, LogLevel level = LogLevel.Info)
+    {
+        var logger = Instance.LogSource;
+
         var t = DateTime.Now.ToString("HH:mm:ss");
+
         var log_text = $"[{t}]";
-        if (tag != null) log_text += $"[{tag}]";
-        if (filename != null) log_text += $"[{filename}]";
+
+        if (tag != null)
+            log_text += $"[{tag}]";
+
+        if (filename != null)
+            log_text += $"[{filename}]";
+
         log_text += text;
+
         switch (level)
         {
             case LogLevel.Info:
-                logger?.LogInfo(log_text);
+                logger.LogInfo(log_text);
                 break;
             case LogLevel.Warning:
-                logger?.LogWarning(log_text);
+                logger.LogWarning(log_text);
                 break;
             case LogLevel.Error:
-                logger?.LogError(log_text);
+                logger.LogError(log_text);
                 break;
             case LogLevel.Fatal:
-                logger?.LogFatal(log_text);
+                logger.LogFatal(log_text);
                 break;
             case LogLevel.Message:
-                logger?.LogMessage(log_text);
+                logger.LogMessage(log_text);
                 break;
             case LogLevel.Debug:
-                logger?.LogDebug(log_text);
+                logger.LogDebug(log_text);
                 break;
             case LogLevel.None:
-                logger?.LogInfo(log_text);
+                logger.LogInfo(log_text);
                 break;
             case LogLevel.All:
                 break;
             default:
-                logger?.LogWarning("Error:Invalid LogLevel");
-                logger?.LogInfo(log_text);
+                logger.LogWarning("Error:Invalid LogLevel");
+                logger.LogInfo(log_text);
                 break;
         }
-    }
-
-    /*
-        各消息作用:
-
-        发生了致命错误，无法从中恢复 : A fatal error has occurred, which cannot be recovered from
-        Fatal
-
-        发生错误，但可以从中恢复 : An error has occured, but can be recovered from
-        Error
-
-        已发出警告，但并不一定意味着发生了错误 : A warning has been produced, but does not necessarily mean that something wrong has happened
-        Warning
-
-        应向用户显示的重要消息 : An important message that should be displayed to the user
-        Message
-
-        重要性较低的消息 :  A message of low importance
-        Info
-
-        可能只有开发人员感兴趣的消息 : A message that would likely only interest a developer
-        Debug,
-    */
-
-    public static void Info(string text, string? tag = null, string? filename = null)
-    {
-        Instance?.SendToFile(tag, filename, text);
-    }
-
-    public static void Warn(string text, string? tag = null, string? filename = null)
-    {
-        Instance?.SendToFile(tag, filename, text, LogLevel.Warning);
-    }
-
-    public static void Error(string text, string? tag = null, string? filename = null)
-    {
-        Instance?.SendToFile(tag, filename, text, LogLevel.Error);
-    }
-
-    public static void Fatal(string text, string? tag = null, string? filename = null)
-    {
-        Instance?.SendToFile(tag, filename, text, LogLevel.Fatal);
-    }
-
-    public static void Msg(string text, string? tag = null, string? filename = null)
-    {
-        Instance?.SendToFile(tag, filename, text, LogLevel.Message);
-    }
-
-    public static void Exception(Exception ex, string? tag = null, string? filename = null)
-    {
-        Instance?.SendToFile(tag, filename, ex.ToString(), LogLevel.Error);
-    }
-
-    public static void Debug(string text, string? tag = null, string? filename = null)
-    {
-        Instance?.SendToFile(tag, filename, text, LogLevel.Debug);
     }
 }

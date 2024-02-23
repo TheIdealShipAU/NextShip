@@ -1,4 +1,4 @@
-using NextShip.Api.Utilities.Attributes;
+using NextShip.Api.Attributes;
 using UnityEngine;
 
 namespace NextShip.UI.UIManager;

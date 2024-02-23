@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
         <Version>1.0.0</Version>
         <LangVersion>latest</LangVersion>
         <DebugType>embedded</DebugType>
@@ -18,17 +18,20 @@
 
     <ItemGroup>
         <!--nuget.org 的包                                              -->
-        <!--        <PackageReference Include="Reactor" Version="2.2.0" />-->
         <PackageReference Include="GitInfo" Version="3.3.3">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Csv" Version="2.0.93"/>
         <PackageReference Include="Costura.Fody" Version="5.8.0-alpha0098" PrivateAssets="all"/>
-        <PackageReference Include="Downloader" Version="3.0.6"/>
+        <PackageReference Include="Downloader" Version="3.1.0-beta"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.AutoActivation" Version="8.0.0"/>
+        <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0"/>
+        <PackageReference Include="Microsoft.Extensions.FileSystemGlobbing" Version="8.0.0"/>
+
         <!--nuget.bepinex.dev 的包                                       -->
-        <PackageReference Include="BepInEx.Unity.IL2CPP" Version="6.0.0-be.674" Private="false" ExcludeAssets="runtime;native"/>
-        <PackageReference Include="AmongUs.GameLibs.Steam" Version="2023.10.24" PrivateAssets="all"/>
+        <PackageReference Include="BepInEx.Unity.IL2CPP" Version="6.0.0-be.688" Private="false" ExcludeAssets="runtime;native" />
+        <PackageReference Include="AmongUs.GameLibs.Steam" Version="2023.11.28" PrivateAssets="all"/>
         <PackageReference Include="BepInEx.IL2CPP.MSBuild" Version="2.1.0-rc.1" PrivatPeAssets="all" ExcludeAssets="runtime"/>
     </ItemGroup>
 
@@ -36,6 +39,9 @@
         <ProjectReference Include="..\NextShip.Api\NextShip.Api.csproj"/>
     </ItemGroup>
 
+    <ItemGroup>
+        <Folder Include="RPC\"/>
+    </ItemGroup>
 
     <Target Name="Copy" AfterTargets="Build" Condition="$(NextShipLast) != ''">
         <Copy SourceFiles="$(OutputPath)/$(AssemblyName).dll" DestinationFolder="$(NextShipLast)/BepInEx/plugins/" UseSymboliclinksIfPossible="true"/>

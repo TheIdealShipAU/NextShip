@@ -1,20 +1,7 @@
-using System.Collections.Generic;
 using HarmonyLib;
-using NextShip.Game.Info;
-using NextShip.Manager;
 using UnityEngine;
 
 namespace NextShip.Cosmetics;
-
-public class ShipCosmeticsManager : Manager<ShipCosmeticsManager>
-{
-    public List<ShipInfo> ShipInfos = new();
-}
-
-[HarmonyPatch]
-internal static class ShipCosmeticsCache
-{
-}
 
 [HarmonyPatch]
 internal static class ShipCosmeticsSet

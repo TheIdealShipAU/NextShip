@@ -1,5 +1,22 @@
 ﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<s:String x:Key="/Default/CodeInspection/Highlighting/SweaWarningsMode/@EntryValue">ShowAndRun</s:String>
 	<s:String x:Key="/Default/Environment/AssemblyExplorer/XmlDocument/@EntryValue">&lt;AssemblyExplorer&gt;&#xD;
   &lt;PhysicalFolder Path="C:\Users\Huier\.nuget\packages\bepinex.il2cpp.msbuild\2.0.1" Loaded="True" /&gt;&#xD;
   &lt;PhysicalFolder Path="C:\Users\Huier\.nuget\packages\bepinex.il2cpp.msbuild\2.1.0-rc.1" Loaded="True" /&gt;&#xD;
+  &lt;PhysicalFolder Path="C:\Users\Huier\.nuget\packages\bepinex.unity.common\6.0.0-be.662" Loaded="True" /&gt;&#xD;
+  &lt;PhysicalFolder Path="C:\Users\Huier\.nuget\packages\bepinex.unity.common\6.0.0-be.668" Loaded="True" /&gt;&#xD;
+  &lt;PhysicalFolder Path="C:\Users\Huier\.nuget\packages\bepinex.unity.common\6.0.0-be.671" Loaded="True" /&gt;&#xD;
+  &lt;PhysicalFolder Path="C:\Users\Huier\.nuget\packages\bepinex.unity.common\6.0.0-be.672" Loaded="True" /&gt;&#xD;
+  &lt;PhysicalFolder Path="C:\Users\Huier\.nuget\packages\bepinex.unity.common\6.0.0-be.674" Loaded="True" /&gt;&#xD;
+  &lt;PhysicalFolder Path="C:\Users\Huier\.nuget\packages\bepinex.unity.common\6.0.0-be.679" Loaded="True" /&gt;&#xD;
+  &lt;PhysicalFolder Path="C:\Users\Huier\.nuget\packages\bepinex.unity.common\6.0.0-be.682" Loaded="True" /&gt;&#xD;
+  &lt;PhysicalFolder Path="C:\Users\Huier\.nuget\packages\bepinex.unity.common\6.0.0-be.688" Loaded="True" /&gt;&#xD;
+  &lt;PhysicalFolder Path="C:\Users\Huier\.nuget\packages\bepinex.unity.il2cpp\6.0.0-be.662" Loaded="True" /&gt;&#xD;
+  &lt;PhysicalFolder Path="C:\Users\Huier\.nuget\packages\bepinex.unity.il2cpp\6.0.0-be.668" Loaded="True" /&gt;&#xD;
+  &lt;PhysicalFolder Path="C:\Users\Huier\.nuget\packages\bepinex.unity.il2cpp\6.0.0-be.671" Loaded="True" /&gt;&#xD;
+  &lt;PhysicalFolder Path="C:\Users\Huier\.nuget\packages\bepinex.unity.il2cpp\6.0.0-be.672" Loaded="True" /&gt;&#xD;
+  &lt;PhysicalFolder Path="C:\Users\Huier\.nuget\packages\bepinex.unity.il2cpp\6.0.0-be.674" Loaded="True" /&gt;&#xD;
+  &lt;PhysicalFolder Path="C:\Users\Huier\.nuget\packages\bepinex.unity.il2cpp\6.0.0-be.679" Loaded="True" /&gt;&#xD;
+  &lt;PhysicalFolder Path="C:\Users\Huier\.nuget\packages\bepinex.unity.il2cpp\6.0.0-be.682" Loaded="True" /&gt;&#xD;
+  &lt;PhysicalFolder Path="C:\Users\Huier\.nuget\packages\bepinex.unity.il2cpp\6.0.0-be.688" Loaded="True" /&gt;&#xD;
 &lt;/AssemblyExplorer&gt;</s:String></wpf:ResourceDictionary>

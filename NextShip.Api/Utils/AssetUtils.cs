@@ -1,3 +1,4 @@
+#nullable enable
 using Il2CppInterop.Runtime;
 using Il2CppInterop.Runtime.InteropTypes;
 using UnityEngine;
@@ -12,11 +13,11 @@ public static class AssetUtils
     public static PetBehaviour GetPetBehaviour(this string id)
     {
         var asset = _CosmeticsCache.GetPet(id);
-        if (asset.Data.ProdId == "pet_EmptyPet" && _hatManager.allPets.FirstOrDefault(n => n.ProdId == id) != null)
-        {
-            var Asset = _hatManager.GetPetById(id).CreateAddressableAsset();
-            Asset.LoadAsync((Action)(() => asset = Asset.GetAsset()));
-        }
+        if (asset.Data.ProdId != "pet_EmptyPet" ||
+            _hatManager.allPets.FirstOrDefault(n => n.ProdId == id) == null) return asset;
+
+        var Asset = _hatManager.GetPetById(id).CreateAddressableAsset();
+        Asset.LoadAsync((Action)(() => asset = Asset.GetAsset()));
 
         return asset;
     }
@@ -46,15 +47,15 @@ public static class AssetUtils
     }
 
 
-    public static T LoadAsset<T>(this AssetBundle? bundle, string name) where T : Il2CppObjectBase
+    public static T? LoadAsset<T>(this AssetBundle? bundle, string name) where T : Il2CppObjectBase
     {
-        return bundle.LoadAsset(name, Il2CppType.Of<T>()).Cast<T>();
+        return bundle != null ? bundle.LoadAsset(name, Il2CppType.Of<T>()).Cast<T>() : null;
     }
 
-    public static T[] LoadAllAsset<T>(this AssetBundle? bundle) where T : Il2CppObjectBase
+    public static T[] LoadAllAsset<T>(this AssetBundle bundle) where T : Il2CppObjectBase
     {
         var assets = bundle.LoadAllAssets(Il2CppType.Of<T>());
-        var assetArray = new T[assets.Length];
+        var assetArray = new T[assets!.Length];
         var count = 0;
         foreach (var asset in assets)
         {

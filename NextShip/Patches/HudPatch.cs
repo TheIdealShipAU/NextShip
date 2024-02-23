@@ -1,11 +1,8 @@
-/*using AmongUs.Data;
 using HarmonyLib;
-using NextShip.RPC;
-using NextShip.Utilities;
-using UnityEngine;
+using NextShip.NextEvents;
 
 namespace NextShip.Patches;
-
+/*
 [HarmonyPatch]
 public static class LoveChatPatch
 {
@@ -93,4 +90,14 @@ public static class LoveChatPatch
         return false;
     }
 }*/
+
+[Harmony]
+public static class OnHudManagerUpdatePatch
+{
+    [HarmonyPatch(typeof(HudManager), nameof(HudManager.Update)), HarmonyPostfix]
+    public static void OnHudManagerUpdate(HudManager __instance)
+    {
+        _eventManager.CallEvent(new HudManagerUpdateEvent(__instance));
+    }
+}
 

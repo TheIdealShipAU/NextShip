@@ -1,3 +1,4 @@
+#nullable enable
 using HarmonyLib;
 using UnityEngine;
 using UnityEngine.Events;
@@ -17,7 +18,7 @@ public static class GameObjectUtils
     public static void DestroyTranslator(this GameObject obj)
     {
         TextTranslatorTMP[] translatorTMPs = obj.GetComponentsInChildren<TextTranslatorTMP>(true);
-        if (translatorTMPs != null) translatorTMPs.Do(n => Object.Destroy(n));
+        translatorTMPs?.Do(Object.Destroy);
     }
 
     /// <summary>
@@ -34,30 +35,30 @@ public static class GameObjectUtils
     public static void DestroyAspectPosition(this GameObject gameObject)
     {
         AspectPosition[] aspectPositions = gameObject.GetComponentsInChildren<AspectPosition>(true);
-        if (aspectPositions != null) aspectPositions.Do(n => Object.Destroy(n));
+        aspectPositions?.Do(Object.Destroy);
     }
 
     public static void DestroyComponents<T>(this GameObject gameObject) where T : Object
     {
         T[] components = gameObject.GetComponentsInChildren<T>(true);
-        if (components != null) components.Do(n => Object.Destroy(n));
+        components?.Do(Object.Destroy);
     }
 
-    public static (GameObject, T) CreateGameObject<T>(string name = null, Transform parent = null,
+    public static (GameObject, T) CreateGameObject<T>(string? name = null, Transform? parent = null,
         Vector3 vector3 = default) where T : Component
     {
         var gameObject = CreateGameObject(name, parent, vector3);
         return (gameObject, gameObject.AddComponent<T>());
     }
 
-    public static GameObject CreateGGameObject<T>(string name = null, Transform parent = null,
+    public static GameObject CreateGGameObject<T>(string? name = null, Transform? parent = null,
         Vector3 vector3 = default)
         where T : Component
     {
         return CreateGameObject<T>(name, parent, vector3).Item1;
     }
 
-    public static T CreateCGameObject<T>(string name = null, Transform parent = null, Vector3 vector3 = default)
+    public static T CreateCGameObject<T>(string? name = null, Transform? parent = null, Vector3 vector3 = default)
         where T : Component
     {
         return CreateGameObject<T>(name, parent, vector3).Item2;
@@ -66,14 +67,14 @@ public static class GameObjectUtils
     public static PassiveButton CreatePassiveButton
     (
         this GameObject @object,
-        Action onClick = null,
-        GameObject activeSprite = null,
-        GameObject inactiveSprite = null,
-        GameObject disabledSprite = null,
-        AudioClip ClickSound = null,
-        AudioClip HoverSound = null,
-        Action OnMouseOut = null,
-        Action OnMouseOver = null
+        Action? onClick = null,
+        GameObject? activeSprite = null,
+        GameObject? inactiveSprite = null,
+        GameObject? disabledSprite = null,
+        AudioClip? ClickSound = null,
+        AudioClip? HoverSound = null,
+        Action? OnMouseOut = null,
+        Action? OnMouseOver = null
     )
     {
         var button = @object.AddComponent<PassiveButton>();
@@ -98,7 +99,7 @@ public static class GameObjectUtils
         return button;
     }
 
-    public static GameObject CreateGameObject(string name = null, Transform parent = null, Vector3 position = default)
+    public static GameObject CreateGameObject(string? name = null, Transform? parent = null, Vector3 position = default)
     {
         var gameObject = new GameObject
         {
@@ -125,19 +126,19 @@ public static class GameObjectUtils
         }
     }
 
-    public static bool GetGameObjetWithCondition(out GameObject LastgameObject, out List<Transform> allTransform,
-        out List<bool> bools, bool test = false, params string[] stings)
+    public static bool GetGameObjetWithCondition(out GameObject LastGameObject, out List<Transform> allTransform,
+        out List<bool> Bools, bool test = false, params string[] stings)
     {
-        bools = new List<bool>();
+        Bools = new List<bool>();
         allTransform = new List<Transform>();
-        LastgameObject = null;
+        LastGameObject = null!;
         for (var i = 0; i < stings.Length; i++)
         {
             if (i == 0)
             {
-                LastgameObject = GameObject.Find(stings[i]);
-                bools.Add(LastgameObject);
-                if (LastgameObject) allTransform.Add(LastgameObject.transform);
+                LastGameObject = GameObject.Find(stings[i]);
+                Bools.Add(LastGameObject);
+                if (LastGameObject) allTransform.Add(LastGameObject.transform);
 
                 if (test)
                 {
@@ -147,10 +148,10 @@ public static class GameObjectUtils
             }
             else
             {
-                if (!LastgameObject) return false;
-                var transform = LastgameObject.transform.Find(stings[i]);
-                bools.Add(transform);
-                LastgameObject = transform.gameObject;
+                if (!LastGameObject) return false;
+                var transform = LastGameObject.transform.Find(stings[i]);
+                Bools.Add(transform);
+                LastGameObject = transform.gameObject;
                 allTransform.Add(transform);
 
                 if (test)
@@ -160,13 +161,13 @@ public static class GameObjectUtils
                 }
             }
 
-            Info($"i:{i} name:{stings[i]} bool:{bools.Last()}");
+            Info($"i:{i} name:{stings[i]} bool:{Bools.Last()}");
         }
 
-        return bools.Last();
+        return Bools.Last();
     }
 
-    public static GameObject GetGameObjetFormAll(string name, string[] OptionPaths = null)
+    public static GameObject? GetGameObjetFormAll(string name, string[]? OptionPaths = null)
     {
         var RootGameObjects = SceneManager.GetActiveScene().GetRootGameObjects();
 

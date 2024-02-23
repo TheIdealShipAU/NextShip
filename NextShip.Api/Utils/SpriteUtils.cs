@@ -1,3 +1,4 @@
+#nullable enable
 using System.Reflection;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using UnityEngine;
@@ -17,7 +18,7 @@ public static class SpriteUtils
         CacheSprite.Add(sprite);
     }
 
-    public static Sprite GetCache(string name, bool NoCache = false)
+    public static Sprite? GetCache(string name, bool NoCache = false)
     {
         var sprite = CacheSprite.FirstOrDefault(n => n.name == name);
         if (sprite == null || sprite == default)
@@ -37,7 +38,7 @@ public static class SpriteUtils
         {
             if (CachedSprites.TryGetValue(path + pixelsPerUnit, out var sprite)) return sprite;
             var texture = LoadTextureFromResources(path);
-            sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f),
+            sprite = Sprite.Create(texture, new Rect(0, 0, texture!.width, texture.height), new Vector2(0.5f, 0.5f),
                 pixelsPerUnit);
             sprite.hideFlags |= HideFlags.HideAndDontSave | HideFlags.DontSaveInEditor;
             return CachedSprites[path + pixelsPerUnit] = sprite;
@@ -50,14 +51,14 @@ public static class SpriteUtils
         return null;
     }
 
-    public static Sprite LoadSpriteFromResources(string path, float pixelsPerUnit, Vector2 pivot, uint extrude,
+    public static Sprite? LoadSpriteFromResources(string path, float pixelsPerUnit, Vector2 pivot, uint extrude,
         SpriteMeshType meshType, Vector4 border)
     {
         try
         {
             if (CachedSprites.TryGetValue(path + pixelsPerUnit, out var sprite)) return sprite;
             var texture = LoadTextureFromResources(path);
-            sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), pivot,
+            sprite = Sprite.Create(texture, new Rect(0, 0, texture!.width, texture.height), pivot,
                 pixelsPerUnit, extrude, meshType, border);
             sprite.hideFlags |= HideFlags.HideAndDontSave | HideFlags.DontSaveInEditor;
             return CachedSprites[path + pixelsPerUnit] = sprite;
@@ -78,7 +79,7 @@ public static class SpriteUtils
         return FullRectSprite;
     }
 
-    public static unsafe Texture2D LoadTextureFromResources(string path)
+    public static unsafe Texture2D? LoadTextureFromResources(string path)
     {
         try
         {
@@ -88,8 +89,7 @@ public static class SpriteUtils
             if (stream == null) return texture;
             var length = stream.Length;
             var byteTexture = new Il2CppStructArray<byte>(length);
-            var _ = stream.Read(new Span<byte>(IntPtr.Add(byteTexture.Pointer, IntPtr.Size * 4).ToPointer(),
-                (int)length));
+            var _ = stream.Read(byteTexture.ToSpan());
             ImageConversion.LoadImage(texture, byteTexture, false);
 
             return texture;
@@ -110,7 +110,7 @@ public static class SpriteUtils
         return texture;
     }
 
-    public static Texture2D LoadTextureFromDisk(string path)
+    public static Texture2D? LoadTextureFromDisk(string path)
     {
         try
         {
@@ -125,13 +125,13 @@ public static class SpriteUtils
         return null;
     }
 
-    public static Sprite LoadSpriteFromDisk(string path, float pixelsPerUnit)
+    public static Sprite? LoadSpriteFromDisk(string path, float pixelsPerUnit)
     {
         try
         {
             if (CachedSprites.TryGetValue(path + pixelsPerUnit, out var sprite)) return sprite;
             var texture = LoadTextureFromDisk(path);
-            sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f),
+            sprite = Sprite.Create(texture, new Rect(0, 0, texture!.width, texture.height), new Vector2(0.5f, 0.5f),
                 pixelsPerUnit);
             sprite.hideFlags |= HideFlags.HideAndDontSave | HideFlags.DontSaveInEditor;
             return CachedSprites[path + pixelsPerUnit] = sprite;
@@ -144,7 +144,7 @@ public static class SpriteUtils
         return null;
     }
 
-    public static Sprite LoadSpriteFromResources(string FileName)
+    public static Sprite? LoadSpriteFromResources(string FileName)
     {
         var TheAssembly = Assembly.GetExecutingAssembly();
         var names = TheAssembly.GetManifestResourceNames();
@@ -155,13 +155,13 @@ public static class SpriteUtils
         return Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f),
             100f);
 
-        bool isFile(string name)
+        bool isFile(string _name)
         {
-            if (name.EndsWith(FileName)) return true;
+            if (_name.EndsWith(FileName)) return true;
 
-            var strings = name.Split(".");
+            var strings = _name.Split(".");
             var str = names[strings.Length - 2];
-            var n = name.Replace(".png", "");
+            var n = _name.Replace(".png", "");
             return n == str;
         }
     }

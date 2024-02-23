@@ -1,34 +1,20 @@
 namespace NextShip.Api.Roles;
 
-public abstract class RoleBase : IDisposable
+public abstract class RoleBase(PlayerControl player) : IDisposable
 {
-    protected RoleBase(PlayerControl? player)
-    {
-        CanKill = false;
-        CanVent = false;
-        HasTask = true;
-        WinCheck = () => false;
-        Player = player;
+    public PlayerControl Player { get; private set; } = player;
 
-        Active = true;
-        RoleManager.Get().AllRoleBases.Add(this);
-    }
+    public Func<bool> WinCheck { get; } = () => false;
+    public bool CanKill { get; } = false;
+    public bool CanVent { get; } = false;
+    public bool HasTask { get; } = true;
 
-    public Role ParentRole { get; protected set; } = null!;
-    public PlayerControl? Player { get; private set; }
-
-    public Func<bool> WinCheck { get; }
-    public bool CanKill { get; }
-    public bool CanVent { get; }
-    public bool HasTask { get; }
-
-    public bool Active { get; protected set; }
+    public bool Active { get; protected set; } = true;
 
     public void Dispose()
     {
         OnDestroy();
         Player = null;
-        RoleManager.Get().AllRoleBases.Remove(this);
     }
 
     public virtual void RpcSyncWriter()

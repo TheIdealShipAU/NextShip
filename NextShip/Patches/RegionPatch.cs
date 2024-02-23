@@ -30,39 +30,33 @@ public static class RegionMenuOpenPatch
                 __instance.transform,
                 () =>
                 {
-                    if (ye < maxye)
-                    {
-                        ye++;
-                        Menu.shuaXing(__instance);
-                    }
+                    if (ye >= maxye) return;
+                    ye++;
+                    Menu.Update(__instance);
                 }
             );
 
             xiaButton.gameObject.SetActive(!(Main.serverManager.AvailableRegions.Count <= 6));
         }
 
-        if (shangButton == null || shangButton.gameObject == null)
-        {
-            shangButton = template.CreateButton(
-                "shangButton",
-                "上一页",
-                pos - new Vector3(0f, 2.5f, 0f),
-                __instance.transform,
-                () =>
-                {
-                    if (ye > 1)
-                    {
-                        ye--;
-                        Menu.shuaXing(__instance);
-                    }
-                }
-            );
+        if (shangButton != null && shangButton.gameObject != null) return;
+        shangButton = template.CreateButton(
+            "shangButton",
+            "上一页",
+            pos - new Vector3(0f, 2.5f, 0f),
+            __instance.transform,
+            () =>
+            {
+                if (ye <= 1) return;
+                ye--;
+                Menu.Update(__instance);
+            }
+        );
 
-            xiaButton.gameObject.SetActive(!(Main.serverManager.AvailableRegions.Count <= 6));
-        }
+        xiaButton.gameObject.SetActive(!(Main.serverManager.AvailableRegions.Count <= 6));
     }
 
-    public static GameObject CreateButton(this GameObject template, string name, string text, Vector3 Position,
+    private static GameObject CreateButton(this GameObject template, string name, string text, Vector3 Position,
         Transform Preant, Action action)
     {
         var Button = Object.Instantiate(template, Preant);
@@ -110,25 +104,14 @@ public static class Menu
     {
         RegionMenuOpenPatch.maxye = serverManager.AvailableRegions.Count / 3 +
                                     (serverManager.AvailableRegions.Count % 3 == 0 ? 0 : 1);
-        var regionInfos = new IRegionInfo[1];
+        var regionInfos = Array.Empty<IRegionInfo>();
         if (serverManager.AvailableRegions.Count < 6)
             regionInfos = serverManager.AvailableRegions;
         else
-            updateyer();
-
-        void updateyer()
-        {
-            var rlist = new List<IRegionInfo>();
-            for (var i = 0; i < 3; i++)
-            {
-                var s = RegionMenuOpenPatch.ye * 3 - i;
-                if (s <= serverManager.AvailableRegions.Count) rlist.Add(serverManager.AvailableRegions[s - 1]);
-                regionInfos = rlist.ToArray();
-            }
-        }
+            UpdateYer();
 
         __instance.controllerSelectable.Clear();
-        List<UiElement> List = new();
+        List<UiElement> List = [];
         var num = 0;
         foreach (var regionInfo in regionInfos)
         {
@@ -148,9 +131,21 @@ public static class Menu
         }
 
         List.Do(n => __instance.controllerSelectable.Add(n));
+        return;
+
+        void UpdateYer()
+        {
+            var list = new List<IRegionInfo>();
+            for (var i = 0; i < 3; i++)
+            {
+                var s = RegionMenuOpenPatch.ye * 3 - i;
+                if (s <= serverManager.AvailableRegions.Count) list.Add(serverManager.AvailableRegions[s - 1]);
+                regionInfos = list.ToArray();
+            }
+        }
     }
 
-    public static void shuaXing(RegionMenu __instance)
+    public static void Update(RegionMenu __instance)
     {
         __instance.ButtonPool.ReclaimAll();
         CreateServerOption(__instance);

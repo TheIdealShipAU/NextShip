@@ -1,5 +1,3 @@
 ﻿namespace NextShip.UI.Patches;
 
-public class GameStartManagerButton
-{
-}
+public class GameStartManagerButton;

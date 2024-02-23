@@ -4,7 +4,6 @@ using AmongUs.Data;
 using AmongUs.Data.Legacy;
 using AmongUs.Data.Player;
 using HarmonyLib;
-using NextShip.Manager;
 
 namespace NextShip.Patches;
 
@@ -38,7 +37,7 @@ public class SaveManagerPatch
     [HarmonyPostfix]
     public static void OnJsonSaveDPatch([HarmonyArgument(1)] string filename)
     {
-        var path = FilesManager.CreateDirectory(FilesManager.TIS_ConfigPath).FullName + $"/{filename}";
+        var path = NextPaths.TIS_ConfigPath + $"/{filename}";
         var sourcePath = AUDataPath.CombinePath(filename);
         Info($"name {filename} path1 {sourcePath}, path2 {path}");
         if (!File.Exists(path)) File.Create(path);
@@ -50,7 +49,7 @@ public class SaveManagerPatch
     public static void OnJsonLoadPatch(AbstractUserSaveData __instance)
     {
         var filename = __instance.GetFileName();
-        var sourcePath = FilesManager.TIS_ConfigPath + $"/{filename}";
+        var sourcePath = NextPaths.TIS_ConfigPath + $"/{filename}";
         var DestPath = AUDataPath.CombinePath(filename);
         if (!File.Exists(sourcePath) || !File.Exists(DestPath)) return;
         Info($"name {filename} path1 {sourcePath}, path2 {DestPath}");

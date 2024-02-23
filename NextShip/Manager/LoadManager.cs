@@ -15,7 +15,7 @@ public static class LoadManager
     private static bool Started;
     private static bool HasError;
 
-    public static List<IEnumerator> AllLoad = new();
+    public static readonly List<IEnumerator> AllLoad = new();
 
     [HarmonyPatch(typeof(SplashManager), nameof(SplashManager.Update))]
     [HarmonyPrefix]
@@ -53,8 +53,6 @@ public static class LoadManager
         logo.gameObject.transform.localPosition = new Vector3(0, 0, -5);
         text.gameObject.transform.localPosition = new Vector3(0.2f, -0.9f, -5);
 
-        /*logo.sprite = SpriteUtils.NextShipText_Sprite;*/
-
         text.text = "Loading.....";
         text.alignment = TextAlignmentOptions.Center;
         text.fontSize = 4.5f;
@@ -66,7 +64,8 @@ public static class LoadManager
             yield return null;
         }
 
-        var Co = new StackFullCoroutine(AllLoad.GetEnumerator());
+        using var enumerator = AllLoad.GetEnumerator();
+        var Co = new StackFullCoroutine(enumerator);
 
         while (Co.CanMove())
         {
@@ -108,8 +107,10 @@ public static class LoadManager
     public static void AccountManager_Awake_Patch()
     {
         var fill = GameObject.Find("BlockFill");
-        var color = new Color(0, 0, 0);
-        color.a = 0.9f;
+        var color = new Color(0, 0, 0)
+        {
+            a = 0.9f
+        };
         fill.GetComponent<SpriteRenderer>().color = color;
 
         var text = new GameObject("Text");

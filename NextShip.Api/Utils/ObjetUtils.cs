@@ -1,4 +1,5 @@
-﻿using HarmonyLib;
+﻿#nullable enable
+using HarmonyLib;
 using Il2CppInterop.Runtime;
 using Il2CppInterop.Runtime.InteropTypes;
 using UnityEngine;
@@ -42,7 +43,7 @@ public static class ObjetUtils
         return find ? GetObject.CastFast<T>() : null;
     }
 
-    public static List<T> FindAll<T>(string name) where T : Il2CppObjectBase
+    public static List<T>? FindAll<T>(string name) where T : Il2CppObjectBase
     {
         var find = false;
         var list = new List<T>();
@@ -59,7 +60,7 @@ public static class ObjetUtils
         return find ? list : null;
     }
 
-    public static GameObject Get(this Object obj, string name, Transform Preant = null)
+    public static GameObject Get(this Object obj, string name, Transform? Preant = null)
     {
         var Obj = Object.Instantiate(obj) as GameObject;
         Obj!.name = name;

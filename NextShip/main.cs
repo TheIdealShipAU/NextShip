@@ -1,18 +1,25 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Reflection;
+using System.Threading.Tasks;
 using BepInEx;
 using BepInEx.Logging;
 using BepInEx.Unity.IL2CPP;
 using HarmonyLib;
+using Microsoft.Extensions.DependencyInjection;
+using NextShip.Api.Attributes;
+using NextShip.Api.Extension;
+using NextShip.Api.Interfaces;
+using NextShip.Api.RPCs;
+using NextShip.Api.Services;
 using NextShip.Cosmetics;
+using NextShip.DIY.Plugins;
 using NextShip.Languages;
 using NextShip.Manager;
-using NextShip.Patches;
-using NextShip.Roles;
-using NextShip.UI.Components;
-using NextShip.UI.UIManager;
-using UnityEngine;
+using NextShip.Services;
+using BepInExLogger = BepInEx.Logging.Logger;
 
 [assembly: AssemblyFileVersion(Main.VersionString)]
 [assembly: AssemblyInformationalVersion(Main.VersionString)]
@@ -21,7 +28,7 @@ namespace NextShip;
 
 [BepInPlugin(Id, ModName, VersionString)]
 [BepInProcess("Among Us.exe")]
-public sealed class Main : BasePlugin
+public sealed class NextShip : BasePlugin
 {
     // 模组名称
     public const string ModName = "NextShip";
@@ -30,110 +37,130 @@ public sealed class Main : BasePlugin
     public const string Id = "cn.MengChu.NextShip";
 
     // 模组版本
-    public const string VersionString = "0.5.0";
+    public const string VersionString = "1.0.0";
 
-    // bilibili链接
-    public const string bilibiliURL = "https://space.bilibili.com/394107547";
-
-    public const string QQURL =
-        "http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=OqTfMLjm7lMD5OMV68Rs9JLnbcXc-fDR&authKey=8tt0sNVVsfsGvOBFLNmtDA8CD7fweh%2Bbe1%2FMq2j62zGNWJ17Q%2FNXfG4c7r6JlN1S&noverify=0&group_code=815101721";
-
-    public const string QQNumber = "815101721";
+    public const string BepInExVersion = "682";
 
     // Among Us游玩版本
-    public static readonly AmongUsVersion SupportVersion = new(2023, 7, 21);
+    public static readonly AmongUsVersion SupportVersion = new(2023, 11, 28);
 
-    public static readonly AmongUsVersion[] AmongUsSupportVersions =
-    {
-        SupportVersion
-    };
+    public static readonly ShipVersion Version = new ShipVersion().Parse(VersionString);
 
-    public static readonly string HashCode = HashUtils.GetFileMD5Hash(Paths.PluginPath.CombinePath($"{ModName}.dll"));
+    internal static readonly ServerManager serverManager = FastDestroyableSingleton<ServerManager>.Instance;
 
-    // 模组构建时间
-    public static string BuildTime = "";
+    public static List<INextAdd> Adds;
 
-    // 是否为开发版本
-    public static bool IsDev = true;
+    private ManualLogSource TISLog;
 
-    internal static bool isCn;
-    internal static bool isChinese;
+    public static NextService _Service { get; private set; }
 
-    public static readonly ShipVersion ShipVersion = new ShipVersion().Parse(VersionString);
-    public static Version Version = Version.Parse(VersionString);
-    internal static ManualLogSource TISLog;
-    public static Main Instance;
+    public static Main Instance { get; private set; }
 
-    internal static UpdateTask UpdateTask;
-    internal static readonly ServerManager serverManager = DestroyableSingleton<ServerManager>.Instance;
+    public static Assembly RootAssembly { get; private set; }
 
-    // 模组主颜色
-    public readonly Color ModColor = "#90c2f4".HTMLColorTo32();
-    internal Harmony Harmony { get; } = new(Id);
+    private Harmony Harmony { get; } = new(Id);
+
+    private static event Action<ServiceBuilder> OnBuilder;
+
+    private NextManager _nextManager;
 
 
     public override void Load()
     {
-        if (IsDev)
-            ConsoleTextFC();
+        Instance = this;
+        RootAssembly = Assembly.GetExecutingAssembly();
+        TISLog = BepInExLogger.CreateLogSource(ModName.RemoveBlank());
+        Harmony.PatchAll();
+        _nextManager = AddComponent<NextManager>().DontDestroyOnLoad();
+
+        Api.Logs.Log.Get(TISLog);
+        Init();
+
+        CreateService();
+        LoadDependent();
+        Task.Run(() =>
+        {
+            var roleManager = _Service.Get<NextRoleManager>();
+            FastAddRoleExt.Registration(roleManager, RootAssembly);
+        });
+
+        SteamExtension.UseSteamIdFile();
+        ReactorExtension.UseReactorHandshake();
+        ModStampExtension.UseModStamp();
+        FastRPCExtension.UseFastRPC();
+        FastRpcReaderPatch.AddFormAssembly(RootAssembly);
 
         ConsoleManager.SetConsoleTitle("Among Us " + ModName + " Game");
-        TISLog = BepInEx.Logging.Logger.CreateLogSource(ModName.RemoveBlank());
-
-        constInit();
-
-        Instance = this;
-        Harmony.PatchAll();
-
-        FilesManager.Init();
-        ServerPath.autoAddServer();
-
-        var _Assembly = Assembly.GetExecutingAssembly();
-        RegisterManager.Registration(_Assembly);
-
-        UpdateTask = AddComponent<UpdateTask>();
-        AddComponent<NextUIManager>();
-
-        Init();
+        RegisterManager.Registration();
+        
         LanguagePack.Init();
-
-        UpdateTask.DontDestroyOnLoad();
-
         CustomCosmeticsManager.LoadHat();
-
-        RegisterRoles();
-
-        VanillaManager.Load();
     }
 
-
-    private static void RegisterRoles()
+    private static void Init()
     {
-        var roles = new Role[]
-        {
-            new Postman()
-        };
-
-        Api.Roles.RoleManager.Get().RegisterRole(roles);
-    }
-
-    private static void constInit()
-    {
-#if RELEASE
-            IsDev = false;
-#endif
-        var CountryName = RegionInfo.CurrentRegion.EnglishName;
-        isCn = CountryName.Contains("China"); //|| CountryName.Contains("Hong Kong") || CountryName.Contains("Taiwan");
-        isChinese = (TranslationController.InstanceExists
-            ? TranslationController.Instance.currentLanguage.languageID
-            : SupportedLangs.English) is SupportedLangs.SChinese or SupportedLangs.TChinese;
-
-        Info($"IsDev:{IsDev.ToString()}", "Const");
-        Info($"CountryName:{CountryName} | {RegionInfo.CurrentRegion.DisplayName}", "Const");
-        Info($"isCn:{isCn.ToString()}", "Const");
-        Info($"IsChinese:{isChinese.ToString()}", "Const");
+        Info("IsDev:{}", "Const");
+        Info($"CountryName:| {RegionInfo.CurrentRegion.DisplayName}", "Const");
+        Info("isCn:", "Const");
+        Info("IsChinese:", "Const");
         Info($"Support Among Us Version {SupportVersion}", "Info");
-        Info($"Hash: {HashCode}", "Info");
+        Info("Hash: ", "Info");
         Info($"欢迎游玩{ModName} | Welcome to{ModName}", "Info");
+
+        Adds = INextAdd.GetAdds(RootAssembly);
+        foreach (var varType in Adds)
+            varType.ConfigBind(Instance.Config);
+    }
+
+    private static void InitPlugins()
+    {
+        var manager = PluginManager.Get();
+        manager.InitPlugins();
+        OnBuilder += manager.OnServiceBuild;
+    }
+
+    private void CreateService()
+    {
+        var builder = new ServiceBuilder();
+        builder.CreateService();
+        builder._collection.AddLogging();
+        builder._collection.AddSingleton<IRoleManager, NextRoleManager>();
+        builder._collection.AddSingleton<IEventManager, EventManager>();
+        builder._collection.AddSingleton<IPatchManager, NextPatchManager>();
+        builder._collection.AddSingleton<IPlayerManager, NextPlayerManager>();
+        builder._collection.AddSingleton<INextOptionManager, NextOptionManager>();
+        builder._collection.AddSingleton<INextButtonManager, NextButtonsManager>();
+        builder._collection.AddSingleton<INextScreenManager, NextScreenManager>();
+        builder._collection.AddSingleton<IBotManager, NextBotManager>();
+        builder._collection.AddSingleton<ILangManager, NextLangManager>();
+        builder._collection.AddSingleton<IKeyBindManager, NextKeyBindManager>();
+        builder._collection.AddSingleton(_nextManager);
+        builder._collection.AddHttpClient();
+        builder.AddTransient<GithubAnalyzer>();
+        builder.Add<DownloadService>();
+        builder.Add<MetadataService>();
+        builder.Add<DataService>();
+        builder.Add<DependentService>();
+        builder.Add<InstanceManager>();
+
+        OnBuilder?.Invoke(builder);
+
+        foreach (var varType in Adds)
+            varType.ServiceAdd(builder);
+
+        _Service = NextService.Build(builder);
+        ServiceAddAttribute.Registration(_Service._Provider, RootAssembly);
+    }
+
+    private static void LoadDependent()
+    {
+        var service = _Service.Get<DependentService>();
+        service.SetPath(new DirectoryInfo(NextPaths.TIS_Lib));
+
+        foreach (var varType in Adds)
+            varType.DependentAdd(service);
+
+        service.BuildDependent();
+        service.LoadDependent();
     }
 }

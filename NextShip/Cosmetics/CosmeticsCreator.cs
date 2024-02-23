@@ -1,21 +1,16 @@
 using System.Collections.Generic;
 using System.Linq;
-using NextShip.Cosmetics.Loaders;
+using NextShip.Api.Enums;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
 namespace NextShip.Cosmetics;
 
-public class CosmeticsCreator
+public class CosmeticsCreator(List<Sprite> allSprites)
 {
     private static Material hatShader;
 
-    public List<Sprite> AllSprites;
-
-    public CosmeticsCreator(List<Sprite> allSprites)
-    {
-        AllSprites = allSprites;
-    }
+    public readonly List<Sprite> AllSprites = allSprites;
 
     private Sprite Get(string name)
     {
@@ -51,6 +46,8 @@ public class CosmeticsCreator
         hatData.ViewDataRef = assetRef;
         hatData.CreateAddressableAsset();
 
+        AllCosmeticsCache.AllHatViewDatasCache.Add(hatView);
+
         return (hatView, hatData);
     }
 
@@ -69,6 +66,8 @@ public class CosmeticsCreator
 
         namePlateData.ViewDataRef = assetRef;
         namePlateData.CreateAddressableAsset();
+
+        AllCosmeticsCache.AllNamePlateViewDatasCache.Add(namePlateView);
 
         return (namePlateView, namePlateData);
     }
@@ -90,6 +89,9 @@ public class CosmeticsCreator
 
         skinData.ViewDataRef = assetRef;
         skinData.CreateAddressableAsset();
+
+        AllCosmeticsCache.AllSkinViewDatasCache.Add(skinView);
+
         return (skinView, skinData);
     }
 
@@ -112,6 +114,35 @@ public class CosmeticsCreator
 
         visorData.ViewDataRef = assetRef;
         visorData.CreateAddressableAsset();
+
+        AllCosmeticsCache.AllVisorViewDatasCache.Add(visorView);
+
         return (visorView, visorData);
+    }
+
+    public (PetBehaviour, PetData) CreatePet(CosmeticsInfo info)
+    {
+        var petData = ScriptableObject.CreateInstance<PetData>();
+        var Behaviour = new GameObject(info.Name).AddComponent<PetBehaviour>();
+
+        Behaviour.data = petData;
+        /*visorView.FloorFrame = Get(info.Resource);
+        visorView.ClimbFrame = Get(info.ClimbResource);
+        visorView.IdleFrame = Get(info.FlipResource);
+        visorView.LeftIdleFrame = Get(info.BackFlipResource);*/
+
+        petData.name = info.Name;
+        petData.displayOrder = 99;
+        petData.ProductId = info.Id;
+        petData.Free = true;
+
+        var assetRef = new AssetReference(petData.Pointer);
+
+        petData.PetPrefabRef = assetRef;
+        petData.CreateAddressableAsset();
+
+        AllCosmeticsCache.AllPetBehavioursCache.Add(Behaviour);
+
+        return (Behaviour, petData);
     }
 }

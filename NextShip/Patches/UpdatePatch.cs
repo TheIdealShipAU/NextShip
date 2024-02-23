@@ -10,17 +10,16 @@ internal class HudManagerUpdatePatch
     private static void setPlayerNameColor(PlayerControl p, Color color)
     {
         p.cosmetics.nameText.color = color;
-        if (MeetingHud.Instance != null)
-            foreach (var player in MeetingHud.Instance.playerStates)
-                if (player.NameText != null && p.PlayerId == player.TargetPlayerId)
-                    player.NameText.color = color;
+        if (MeetingHud.Instance == null) return;
+        foreach (var player in MeetingHud.Instance.playerStates)
+            if (player.NameText != null && p.PlayerId == player.TargetPlayerId)
+                player.NameText.color = color;
     }
 
     private static void SetNameColors()
     {
         var localPlayer = CachedPlayer.LocalPlayer.PlayerControl;
-/*             var localRoleInfo = RoleHelpers.GetRoleInfo(localPlayer, false); */
-/*             setPlayerNameColor(localPlayer, localRoleInfo.color); */
+
     }
 
     private static void updateVentButton(HudManager __instance)

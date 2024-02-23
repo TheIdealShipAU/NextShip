@@ -1,8 +1,6 @@
-global using static NextShip.Languages.Language;
 using System.Collections.Generic;
 using System.IO;
-using csv = NextShip.Languages.LanguageCSV;
-using pack = NextShip.Languages.LanguagePack;
+using System.Linq;
 
 namespace NextShip.Languages;
 
@@ -13,30 +11,19 @@ public static class Language
         var langId = TranslationController.InstanceExists
             ? TranslationController.Instance.currentLanguage.languageID
             : SupportedLangs.English;
-        var str = "";
-        if (File.Exists(@"Language\" + LanguagePack.languageName + ".dat"))
-            str = LanguagePack.GetPString(s);
-        else
-            str = csv.GetCString(s, langId);
-        if (replacementDic != null)
-            foreach (var rd in replacementDic)
-                str = str.Replace(rd.Key, rd.Value);
-        return str;
+        var str = File.Exists(@"Language\" + LanguagePack.languageName + ".dat")
+            ? LanguagePack.GetPString(s)
+            : LanguageCSV.GetCString(s, langId);
+        return replacementDic == null
+            ? str
+            : replacementDic.Aggregate(str, (current, rd) => current.Replace(rd.Key, rd.Value));
     }
 
     public static void Init()
     {
         if (!File.Exists(@"Language\" + LanguagePack.languageName + ".dat"))
-            csv.LoadCSV();
+            LanguageCSV.LoadCSV();
         else
-            pack.Load();
+            LanguagePack.Load();
     }
-}
-
-public enum OutputType
-{
-    Csv,
-    Yaml,
-    Json,
-    Txt
 }

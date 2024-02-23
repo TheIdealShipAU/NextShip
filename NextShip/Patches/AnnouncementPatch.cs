@@ -11,7 +11,7 @@ namespace NextShip.Patches;
 public class AnnouncementPatch
 {
     //https://github.com/Dolly1016/Nebula/blob/master/Nebula/Module/ModUpdater.cs
-    public static List<Announcement> ModUpdateAnnouncements = new();
+    public static readonly List<Announcement> ModUpdateAnnouncements = [];
 
     [HarmonyPatch(typeof(PlayerAnnouncementData), nameof(PlayerAnnouncementData.SetAnnouncements))]
     [HarmonyPrefix]
@@ -19,7 +19,7 @@ public class AnnouncementPatch
         [HarmonyArgument(0)] ref Il2CppReferenceArray<Announcement> aRange)
     {
         if (ModUpdateAnnouncements == null || ModUpdateAnnouncements.Count == 0) return;
-        List<Announcement> list = new(aRange.ToList());
+        List<Announcement> list = [..aRange.ToList()];
         list.AddRange(ModUpdateAnnouncements);
         list.Sort(AnCompare);
         aRange = list.ToArray();

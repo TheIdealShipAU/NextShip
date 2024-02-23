@@ -8,16 +8,16 @@ using System.Security.Cryptography;
 using System.Threading.Tasks;
 using HarmonyLib;
 using Newtonsoft.Json.Linq;
-using NextShip.Config;
-using NextShip.Manager;
+using NextShip.Api.Config;
+using NextShip.Api.Enums;
 using UnityEngine;
 
 namespace NextShip.Cosmetics.Loaders;
 
 public class TORCosmeticsLoader : CosmeticsLoader
 {
+    private const string HatDirectoryName = "hats";
     private readonly CosmeticType CosmeticType = CosmeticType.Hat;
-    private readonly string HatDirectoryName = "hats";
 
     public override CosmeticType GetCosmeticType()
     {
@@ -57,7 +57,7 @@ public class TORCosmeticsLoader : CosmeticsLoader
 
         var jsonString = await response.Content.ReadAsStringAsync();
         var JObj = JObject.Parse(jsonString)["hats"];
-        var jsonFile = File.CreateText(FilesManager.CreativityPath + $"/{HatJsonName}");
+        var jsonFile = File.CreateText(NextPaths.TIS_TORHats + $"/{HatJsonName}");
         await jsonFile.WriteAsync(jsonString);
 
         if (!JObj.HasValues) return HttpStatusCode.ExpectationFailed;
@@ -79,7 +79,7 @@ public class TORCosmeticsLoader : CosmeticsLoader
 
     private static void AddCosmeticInfoFromJson(JToken JObj, out List<CosmeticsInfo> cosmeticsInfos)
     {
-        cosmeticsInfos = new List<CosmeticsInfo>();
+        cosmeticsInfos = [];
         for (var current = JObj.First; current != null; current = current.Next)
         {
             if (!current.HasValues) continue;
@@ -120,7 +120,7 @@ public class TORCosmeticsLoader : CosmeticsLoader
         var hatStrings = new List<string>();
         var md5 = MD5.Create();
 
-        var directoryPath = FilesManager.GetCosmeticsCacheDirectory(CosmeticType.Hat).FullName;
+        var directoryPath = $"{NextPaths.TIS_TORHats}/Cache".GetDirectory();
 
         foreach (var info in infos)
         {

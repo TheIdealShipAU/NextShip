@@ -6,8 +6,6 @@ using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Unicode;
 using AmongUs.Data;
-using NextShip.Manager;
-using csv = NextShip.Languages.LanguageCSV;
 
 namespace NextShip.Languages;
 
@@ -32,11 +30,6 @@ public class LanguagePack
 
     public Dictionary<string, string> languageSet;
 
-
-    public LanguagePack()
-    {
-        languageSet = new Dictionary<string, string>(defaultLanguageSet);
-    }
 
     //初始化
     public static void Init()
@@ -83,20 +76,17 @@ public class LanguagePack
     // 创建文件夹
     private static void CTT()
     {
-        FilesManager.CreateDirectory(FPath);
-        if (!(Directory.GetDirectories(FPath).Length > 0 || Directory.GetFiles(FPath).Length > 0) ||
-            !File.Exists(LPath) || !File.Exists(PPath))
-        {
-            CreateTT();
-            Msg("正在创建语言模板", "Language Pack");
-        }
+        if ((Directory.GetDirectories(FPath).Length > 0 || Directory.GetFiles(FPath).Length > 0) &&
+            File.Exists(LPath) && File.Exists(PPath)) return;
+        CreateTT();
+        Msg("正在创建语言模板", "Language Pack");
     }
 
     // 创建语言模板
     private static void CreateTT()
     {
         var text = "";
-        foreach (var title in csv.translateMaps)
+        foreach (var title in LanguageCSV.translateMaps)
         {
             text += '"' + $"{title.Key}" + '"' + " : " + '"' + LanguageCSV.GetCString(title.Key, 0) + '"' + "\n";
             File.WriteAllText(LPath, text);
@@ -126,10 +116,8 @@ public class LanguagePack
 
     public void deserialize(string path)
     {
-        using (var sr = new StreamReader(path, Encoding.GetEncoding("utf-8")))
-        {
-            deserialize(sr);
-        }
+        using var sr = new StreamReader(path, Encoding.GetEncoding("utf-8"));
+        deserialize(sr);
     }
 
     public void deserialize(StreamReader reader)

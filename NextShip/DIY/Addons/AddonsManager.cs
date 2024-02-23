@@ -1,7 +1,5 @@
-using NextShip.Manager;
+using NextShip.Api.Bases;
 
-namespace NextShip.Addons;
+namespace NextShip.DIY.Addons;
 
-public class AddonsManager : Manager<AddonsManager>
-{
-}
+public class AddonsManager : Manager<AddonsManager>;

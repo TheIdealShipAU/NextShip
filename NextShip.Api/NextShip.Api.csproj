@@ -1,20 +1,37 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
+        <DebugType>embedded</DebugType>
         <RootNamespace>NextShip.Api</RootNamespace>
         <PackageVersion>1.0.0</PackageVersion>
-        <PackageReadmeFile>APIReadme.md</PackageReadmeFile>
+        <PackageId>NextShip.Api</PackageId>
+        <Copyright>@2024 MengChu</Copyright>
+        <Description>NextShip的API</Description>
+        <Author>MengChu</Author>
+        <RepositoryURL>https://github.com/TheIdealShipAU/NextShip</RepositoryURL>
+        <PackageLicenseUrl>https://github.com/TheIdealShipAU/NextShip/blob/main/LICENSE</PackageLicenseUrl>
+        <PackageProjectUrl>https://github.com/TheIdealShipAU/NextShip</PackageProjectUrl>
+        <PackageReadmeFile>Readme.md</PackageReadmeFile>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="BepInEx.Unity.IL2CPP" Version="6.0.0-be.674" Private="false" ExcludeAssets="runtime;native"/>
-        <PackageReference Include="AmongUs.GameLibs.Steam" Version="2023.10.24" PrivateAssets="all"/>
+        <PackageReference Include="BepInEx.Unity.IL2CPP" Version="6.0.0-be.688" Private="false" ExcludeAssets="runtime;native" />
+        <PackageReference Include="AmongUs.GameLibs.Steam" Version="2023.11.28" PrivateAssets="all"/>
         <PackageReference Include="BepInEx.IL2CPP.MSBuild" Version="2.1.0-rc.1" PrivatPeAssets="all" ExcludeAssets="runtime"/>
+        <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0"/>
+        <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0"/>
         <PackageReference Include="YamlDotNet" Version="13.7.1"/>
+
+        <None Include="Readme.md" Pack="true" PackagePath="\"/>
+        
+        <ProjectReference Include="..\NSLangAnalyzer\NSLangAnalyzer.csproj"/>
+        <ProjectReference Include="..\NextShip.SourceGenerator\NextShip.SourceGenerator.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer"/>
+        <ProjectReference Include="..\OtherAttribute\OtherAttribute.csproj" />
     </ItemGroup>
 
 </Project>

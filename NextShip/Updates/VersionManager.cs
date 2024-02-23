@@ -10,8 +10,7 @@ public static class VersionManager
         Github,
         Gitee,
         Jsdelivr,
-        Nightly,
-        Alist
+        Nightly
     }
 
     // Github链接
@@ -26,24 +25,20 @@ public static class VersionManager
     // 构建件存放
     public const string nightlyUrl = "https://nightly.link/NextShipAU/NextShip/workflows/Build-Release/main";
 
-    // 服务器alist
-    public const string alistUrl = "http://pan.pafyx.top/TIS";
-
     // 2018k.cnAPI
     public const string KApiUrl = "http://api.2018k.cn";
 
     public const string KApiId = "FC912F87DE524E5393F6F35B66B8ACEB";
 
     // HUdate=HasUpdate 判断是否有更新
-    public static bool HUpdate;
+    public static bool HasUpdate;
 
     public static readonly List<(string, Download)> URLs = new()
     {
         (GithubUrl, Download.Github),
         (GiteeUrl, Download.Gitee),
         (jsdelivrUrl, Download.Jsdelivr),
-        (nightlyUrl, Download.Nightly),
-        (alistUrl, Download.Alist)
+        (nightlyUrl, Download.Nightly)
     };
 
     public static ShipVersion lastVersion;
@@ -109,7 +104,6 @@ public static class VersionManager
         {
             { Download.Github, PingUtils.Ping("github.com") },
             { Download.Gitee, PingUtils.Ping("Gitee.com") },
-            { Download.Alist, PingUtils.Ping("pan.pafyx.top") },
             { Download.Nightly, PingUtils.Ping("nightly.link") },
             { Download.Jsdelivr, PingUtils.Ping("jsdelivr.net") }
         };

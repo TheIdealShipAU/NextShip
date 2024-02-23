@@ -27,10 +27,4 @@ public class StackFullCoroutine
         else if (current.Current is IEnumerator child)
             stack.Add(child);
     }
-
-    public bool Move()
-    {
-        Move();
-        return CanMove();
-    }
 }

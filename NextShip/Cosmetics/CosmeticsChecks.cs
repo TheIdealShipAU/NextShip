@@ -1,16 +1,16 @@
 using System.Collections;
 using System.IO;
-using NextShip.Api.Utilities.Attributes;
+using NextShip.Api.Attributes;
 
 namespace NextShip.Cosmetics;
 
 [Load]
 public static class CosmeticsChecks
 {
-    private static readonly string TORFolderName = "TheOtherHats";
-    public static string[] TORHatStrings;
+    private const string TORFolderName = "TheOtherHats";
 
-    private static readonly string ExtremeHatFolderName = "ExtremeHat";
+    private const string ExtremeHatFolderName = "ExtremeHat";
+    public static string[] TORHatStrings;
 
     public static IEnumerator CheckCosmetics()
     {

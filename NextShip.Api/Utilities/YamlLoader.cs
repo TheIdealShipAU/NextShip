@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿#nullable enable
+using System.Reflection;
 using YamlDotNet.RepresentationModel;
 
 namespace NextShip.Api.Utilities;
@@ -84,13 +85,12 @@ public class YamlLoader
         foreach (var loc in locations)
             try
             {
-                if (valueNode is YamlMappingNode mappingNode)
-                {
-                    var keyNode = new YamlScalarNode(loc);
-                    if (mappingNode.Children.TryGetValue(keyNode, out valueNode))
-                        // 继续向下查找
-                        continue;
-                }
+                if (valueNode is not YamlMappingNode mappingNode) return null;
+
+                var keyNode = new YamlScalarNode(loc);
+                if (mappingNode.Children.TryGetValue(keyNode, out valueNode))
+                    // 继续向下查找
+                    continue;
 
                 // 如果找不到对应的键或节点不是一个映射节点，则返回空列表
                 return null;
@@ -131,13 +131,12 @@ public class YamlLoader
         foreach (var loc in locations)
             try
             {
-                if (valueNode is YamlMappingNode mappingNode)
-                {
-                    var keyNode = new YamlScalarNode(loc);
-                    if (mappingNode.Children.TryGetValue(keyNode, out valueNode))
-                        // 继续向下查找
-                        continue;
-                }
+                if (valueNode is not YamlMappingNode mappingNode) return null;
+
+                var keyNode = new YamlScalarNode(loc);
+                if (mappingNode.Children.TryGetValue(keyNode, out valueNode))
+                    // 继续向下查找
+                    continue;
 
                 // 如果找不到对应的键或节点不是一个映射节点，则返回 null
                 return null;

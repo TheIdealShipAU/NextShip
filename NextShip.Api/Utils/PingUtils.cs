@@ -1,3 +1,4 @@
+#nullable enable
 using System.Net.NetworkInformation;
 using System.Text;
 
@@ -13,43 +14,34 @@ public static class PingUtils
         var reply = ping.Send(url);
 
         var stringB = new StringBuilder();
-        string status;
-        status = reply.Status switch
+        var status = reply.Status switch
         {
             IPStatus.Success => "成功",
             IPStatus.TimedOut => "超时",
             _ => "失败"
         };
+
         stringB.AppendLine("状态：" + status);
 
-        if (reply.Status == IPStatus.Success)
-        {
-            stringB.AppendLine(string.Format("Ip地址: {0} ", reply.Address));
-            stringB.AppendLine(string.Format("ping时间: {0} ", reply.Options.Ttl));
-            stringB.AppendLine(string.Format("ping包大小: {0} ", reply.Buffer.Length));
-            stringB.AppendLine(string.Format("往返时间: {0} ", reply.RoundtripTime));
-        }
+        if (reply.Status != IPStatus.Success)
+            return new PingInfo(reply.Address.ToString(), reply.Options!.Ttl, reply.Buffer.Length,
+                reply.RoundtripTime, stringB);
 
-        return new PingInfo(reply.Address.ToString(), reply.Options.Ttl, reply.Buffer.Length,
+        stringB.AppendLine($"Ip地址: {reply.Address} ");
+        stringB.AppendLine($"ping时间: {reply.Options!.Ttl} ");
+        stringB.AppendLine($"ping包大小: {reply.Buffer.Length} ");
+        stringB.AppendLine($"往返时间: {reply.RoundtripTime} ");
+
+        return new PingInfo(reply.Address.ToString(), reply.Options!.Ttl, reply.Buffer.Length,
             reply.RoundtripTime, stringB);
     }
 }
 
-public class PingInfo
+public class PingInfo(string ip, int pingTime, int size = -1, long roundTripTime = -1, StringBuilder? stringB = null)
 {
-    public string ip;
-    public int pingTime;
-    public long roundTripTime;
-    public int size;
-    public StringBuilder stringB;
-
-    public PingInfo
-        (string ip, int pingTime, int size = -1, long roundTripTime = -1, StringBuilder stringB = null)
-    {
-        this.ip = ip;
-        this.pingTime = pingTime;
-        this.size = size;
-        this.roundTripTime = roundTripTime;
-        this.stringB = stringB;
-    }
+    public readonly int pingTime = pingTime;
+    public string ip = ip;
+    public long roundTripTime = roundTripTime;
+    public int size = size;
+    public StringBuilder? stringB = stringB;
 }

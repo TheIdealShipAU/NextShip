@@ -4,10 +4,9 @@ namespace NextShip.Api.Utils;
 
 public static class TaskUtils
 {
-    public static void StartTask(Action[] actions)
+    public static void StartTask(IEnumerable<Action> actions)
     {
-        actions.Do(
-            StartTask);
+        actions.Do(StartTask);
     }
 
     public static void StartTask(Action action)

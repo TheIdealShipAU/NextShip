@@ -5,37 +5,37 @@ using System.Linq;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using HarmonyLib;
-using NextShip.Config;
+using NextShip.Api.Config;
+using NextShip.Api.Enums;
 using NextShip.Cosmetics.Loaders;
-using NextShip.Manager;
 using UnityEngine;
 
 namespace NextShip.Cosmetics;
 
-public static class CustomCosmeticsManager
+public static partial class CustomCosmeticsManager
 {
     public const string RepoFile = "CosmeticRepo";
-    public static Dictionary<string, CosmeticsInfo> AllCustomCosmeticNameAndInfo = new();
-    public static Dictionary<string, CosmeticRepoType> AllCosmeticRepoRepo = new();
 
-    public static HashSet<Sprite> AllCustomCosmeticSprites = new();
-    public static HashSet<string> AllCosmeticId = new();
+    public static readonly Dictionary<string, CosmeticsInfo> AllCustomCosmeticNameAndInfo = new();
+    public static readonly Dictionary<string, CosmeticRepoType> AllCosmeticRepoRepo = new();
 
-    public static Dictionary<string, HatViewData> AllCustomHatViewData = new();
-    public static List<SkinViewData> AllCustomSkinViewData = new();
-    public static List<VisorViewData> AllCustomVisorViewData = new();
-    public static List<NamePlateViewData> AllCustomNamePlateViewData = new();
+    public static readonly HashSet<Sprite> AllCustomCosmeticSprites = [];
+    public static readonly HashSet<string> AllCosmeticId = [];
+
+    public static readonly Dictionary<string, HatViewData> AllCustomHatViewData = new();
+    public static readonly List<SkinViewData> AllCustomSkinViewData = [];
+    public static readonly List<VisorViewData> AllCustomVisorViewData = [];
+    public static readonly List<NamePlateViewData> AllCustomNamePlateViewData = [];
 
 
     private static CosmeticsLoader _Loaders;
-    public static List<CosmeticsLoader> AllLoaders = new();
+    public static readonly List<CosmeticsLoader> AllLoaders = [];
 
-    internal static readonly string RepoFilePath =
-        Path.Combine(FilesManager.CreativityPath, RepoFile.Is(FilesManager.FileType.Json));
+    private static readonly string RepoFilePath =
+        Path.Combine(NextPaths.CreativityPath, RepoFile.Is(FileType.Json));
 
     private static readonly CosmeticsConfig[] ModConfig =
-    {
-    };
+        Array.Empty<CosmeticsConfig>();
 
     public static Sprite GetSprite(string name)
     {
@@ -53,8 +53,7 @@ public static class CustomCosmeticsManager
         {
             foreach (var config in from config in configs
                      let regex =
-                         new Regex(
-                             @"/https?\/\/:[-a-z0-9]+(\.[-a-z0-9])*\.(com|cn|edu|uk)\/[-a-z0-9_:@&?=+,.!/~*'%$]*/ig")
+                         MyRegex()
                      where regex.IsMatch(config.RepoURL)
                      select config)
             {
@@ -68,7 +67,7 @@ public static class CustomCosmeticsManager
         }
     }
 
-    public static List<CosmeticsConfig> ReadRepoFile()
+    public static IEnumerable<CosmeticsConfig> ReadRepoFile()
     {
         using TextReader textReader = new StreamReader(RepoFilePath);
         return JsonSerializer.Deserialize<List<CosmeticsConfig>>(textReader.ReadToEnd());
@@ -111,27 +110,7 @@ public static class CustomCosmeticsManager
             __instance.allHats = list.ToArray();
         }
     }
-}
 
-public enum CosmeticRepoType
-{
-    TOR,
-    EXR,
-    NOS,
-    TIS
-}
-
-public enum CosmeticType
-{
-    Hat,
-    NamePlate,
-    Visor,
-    Skin
-}
-
-public enum CosmeticLoadType
-{
-    Repo,
-    Disk,
-    Resources
+    [GeneratedRegex(@"/https?\/\/:[-a-z0-9]+(\.[-a-z0-9])*\.(com|cn|edu|uk)\/[-a-z0-9_:@&?=+,.!/~*'%$]*/ig")]
+    private static partial Regex MyRegex();
 }

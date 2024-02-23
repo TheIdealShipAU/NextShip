@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using Object = UnityEngine.Object;
 
-namespace NextShip.UI;
+namespace NextShip.UI.Module;
 
 [HarmonyPatch]
 public class NextOptionMenu

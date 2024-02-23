@@ -9,9 +9,7 @@ public static class HatPatch
     [HarmonyPrefix]
     public static bool HatParent_SetHat_PrefixPatch(HatParent __instance, int color)
     {
-        if (!CustomCosmeticsManager.AllCustomCosmeticNameAndInfo.ContainsKey(__instance.Hat.name)) return true;
-
-        return false;
+        return !CustomCosmeticsManager.AllCustomCosmeticNameAndInfo.ContainsKey(__instance.Hat.name);
     }
 
     [HarmonyPatch(typeof(CosmeticsCache), nameof(CosmeticsCache.GetHat))]

@@ -1,0 +1,64 @@
+name: Build-Release
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    if: ${{ github.repository_owner == 'TheIdealShipAU' }}
+    steps:
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.nuget/packages
+            ~/.cache/bepinex
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+
+      - name: Collect build info
+        id: info
+        uses: actions/github-script@v6
+        with:
+          script: |
+            let version = "1.0.0";
+            core.setOutput(ReleaseVersion, version);
+
+      - name: install wget
+        run: sudo apt install wget
+
+      - name: download BepInEx
+        run: wget https://builds.bepinex.dev/projects/bepinex_be/672/BepInEx-Unity.IL2CPP-win-x86-6.0.0-be.672%2B472e950.zip
+
+      - name: BepInEx
+        run: unzip BepInEx-Unity.IL2CPP-win-x86-6.0.0-be.672+422e950.zip -d ./NextShipRelease/
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 8.x
+
+      - name: build
+        run: dotnet build NextShip/NextShip.csproj --configuration Release
+
+      - name: path
+        run: sudo chmod -R 777 ./NextShipRelease
+        
+      - name: upload NextShip
+        uses: actions/upload-artifact@v3
+        with:
+          name: NextShip.dll
+          path: NextShip/bin/Release/net8.0/NextShip.dll
+
+      - name: upload TheIdealShip
+        uses: actions/upload-artifact@v3
+        with:
+          name: NextShip
+          path: ./NextShipRelease

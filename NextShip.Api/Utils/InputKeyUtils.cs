@@ -6,13 +6,9 @@ public static class InputKeyUtils
 {
     public static bool GetKeysDown(params KeyCode[] keys)
     {
-        if (keys.Any(k => Input.GetKeyDown(k)) && keys.All(k => Input.GetKey(k)))
-        {
-            Warn($"KeyDown:{keys.Where(k => Input.GetKeyDown(k)).First()} in [{string.Join(",", keys)}]");
-            return true;
-        }
-
-        return false;
+        if (!keys.Any(Input.GetKeyDown) || !keys.All(Input.GetKey)) return false;
+        Warn($"KeyDown:{keys.First(Input.GetKeyDown)} in [{string.Join(",", keys)}]");
+        return true;
     }
 
     public static bool GetKeyDown(KeyCode key)

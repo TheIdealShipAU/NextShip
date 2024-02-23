@@ -2,6 +2,12 @@
 
 public static class ListUtils
 {
+    public static List<T> GetSortList<T>(this List<T> list,  Comparison<T> comparison)
+    {
+        list.Sort(comparison);
+        return list;
+    }
+    
     public static List<T> GetLists<T>(this List<T> list, int count)
     {
         var l = new List<T>();

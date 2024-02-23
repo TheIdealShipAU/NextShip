@@ -1,6 +1,6 @@
 using System;
-using NextShip.Api.Utilities.Attributes;
-using NextShip.Options;
+using NextShip.Api.Attributes;
+using NextShip.Api.Bases;
 using TMPro;
 using UnityEngine;
 
@@ -17,10 +17,6 @@ public class ShipOptionBehaviour : MonoBehaviour
 
     public Action<ShipOptionBehaviour> OnOptionValueChanged;
     public OptionBase OptionBase { private set; get; }
-
-    public void FixedUpdate()
-    {
-    }
 
     public void OnEnable()
     {

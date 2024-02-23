@@ -1,3 +1,5 @@
+using Hazel;
+using NextShip.Api.RPCs;
 using UnityEngine;
 
 namespace NextShip.Api;
@@ -19,7 +21,7 @@ public class ShipVersion
     public int Minor { get; protected set; }
     public int Info { get; protected set; }
 
-    public string? StringText { get; protected set; }
+    public string StringText { get; protected set; }
 
     public void set(int major, int minor, int info)
     {
@@ -33,6 +35,28 @@ public class ShipVersion
         var strings = str.Split('.');
         return new ShipVersion(int.Parse(strings[0]), int.Parse(strings[1]), int.Parse(strings[2]));
     }
+
+    public void Write(MessageWriter writer)
+    {
+        writer.Write(Major);
+        writer.Write(Minor);
+        writer.Write(Info);
+    }
+
+    public void Write(FastRpcWriter writer)
+    {
+        writer.Write(Major);
+        writer.Write(Minor);
+        writer.Write(Info);
+    }
+
+    public ShipVersion Read(MessageReader reader)
+    {
+        var major = reader.ReadInt32();
+        var minor = reader.ReadInt32();
+        var info = reader.ReadInt32();
+        return new ShipVersion(major, minor, info);
+    }
 }
 
 public class AmongUsVersion : ShipVersion
@@ -41,7 +65,7 @@ public class AmongUsVersion : ShipVersion
     {
     }
 
-    internal AmongUsVersion()
+    private AmongUsVersion()
     {
     }
 

@@ -3,7 +3,7 @@ using System.Linq;
 using Twitch;
 using UnityEngine;
 
-namespace NextShip.UI;
+namespace NextShip.UI.Module;
 
 public class FastScreen
 {
